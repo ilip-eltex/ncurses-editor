@@ -1,4 +1,5 @@
 #include <termios.h>
+#include <unistd.h>
 #include <sys/ioctl.h>
 #include <signal.h>
 #include <stdlib.h>
@@ -40,26 +41,26 @@ int main (int argc, char ** argv)
 
     	WINDOW *win = newwin (30, 80, 5, 5);
     	wmove (win, 1, 1);
-	printw ("Welcome to ncurses editor! You are editing '%s'. INSERT ONLY", argv[1]);
+	printw ("Welcome to ncurses editor! You are editing '%s'. INSERT ONLY\nF10 Exit; F2 Save; F3 Open", argv[1]);
 	refresh ();
-    	wgetch (win);
 	char c;
-	while (fread (&c, sizeof(char), 1, f) )
-		wprintw (win, "%c", c);
 	
 	wrefresh (win);
 	keypad (win, 1);
 	int winX=0, winY=0, ch;
 	wmove (win, winY, winX);
+	while (fread (&c, sizeof(char), 1, f) )
+                wprintw (win, "%c", c);
+	wmove (win, winY, winX);
 	while (1)
 	{
 		ch = wgetch (win);
-		if (ch == KEY_DC)
+		if (ch == KEY_F(10))
 			break;
 		switch (ch)
 		{
 			case KEY_DOWN: 
-				if ( winY+1 <= 80 ) 
+				if ( winY+1 <= 30 ) 
 				{
 					wmove (win, ++winY, winX);
 				}
@@ -70,10 +71,18 @@ int main (int argc, char ** argv)
 					wmove (win, --winY, winX);
 				}
 				break;
+			case KEY_RIGHT:
+				if (winX+1 <= 80)
+					wmove (win, winY, ++winX);
+				break;
+			case KEY_LEFT:
+				if (winY-1 >= 0)
+					wmove (win, winY, --winX);
+				break;
 					
 		}
 		wrefresh (win);
-
+		access (".", 10);
 	}	
     	delwin(win);
     	endwin();
