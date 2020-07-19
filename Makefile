@@ -1,2 +1,2 @@
 all: 
-	gcc main.c -o ne -lncurses
+	gcc main.c -g -o ne -lncurses

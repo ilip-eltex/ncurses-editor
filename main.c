@@ -7,6 +7,9 @@
 #include <stdio.h>
 #include <string.h>
 
+#  define wcols(w)  ((w)-> _maxx+1 )
+#  define wlines(w) ((w)-> _maxy+1 )
+
 void sig_winch (int signo)
 {
 	struct winsize size;
@@ -57,6 +60,26 @@ int main (int argc, char ** argv)
 		ch = wgetch (win);
 		if (ch == KEY_F(10))
 			break;
+		if (ch == KEY_F(2))
+		{
+		rewind (f);	
+		
+	 	int x,y, lastnospace; int xs, ys;
+		getyx(win, ys, xs);
+			for( y=0; y < wlines(win); y++ ){
+		
+			for( lastnospace = (-1), x=0; x < wcols(win); x++ )
+		
+			if((mvwinch(win,y,x) & A_CHARTEXT) != ' ' )
+				    lastnospace = x;
+			for( x=0 ; x <= lastnospace; x++ ){
+			wmove(win,y,x);
+			putc( winch(win) & A_CHARTEXT, f);
+			}	
+				putc( '\n', f );
+			}
+			wmove(win, ys, xs );
+		}
 		switch (ch)
 		{
 			case KEY_DOWN: 
@@ -82,7 +105,7 @@ int main (int argc, char ** argv)
 					
 		}
 		wrefresh (win);
-		access (".", 10);
+		
 	}	
     	delwin(win);
     	endwin();
