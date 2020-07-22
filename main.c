@@ -26,6 +26,7 @@ int main (int argc, char ** argv)
 	}
 
 	FILE *f = fopen (argv[1], "rw");
+	rewind (f);
 
 	if (f == NULL)
 	{
@@ -54,6 +55,7 @@ int main (int argc, char ** argv)
 	wmove (win, winY, winX);
 	while (fread (&c, sizeof(char), 1, f) )
                 wprintw (win, "%c", c);
+	rewind (f);
 	wmove (win, winY, winX);
 	while (1)
 	{
@@ -61,24 +63,17 @@ int main (int argc, char ** argv)
 		if (ch == KEY_F(10))
 			break;
 		if (ch == KEY_F(2))
-		{
-		rewind (f);	
+		{	
 		
-	 	int x,y, lastnospace; int xs, ys;
-		getyx(win, ys, xs);
-			for( y=0; y < wlines(win); y++ ){
-		
-			for( lastnospace = (-1), x=0; x < wcols(win); x++ )
-		
-			if((mvwinch(win,y,x) & A_CHARTEXT) != ' ' )
-				    lastnospace = x;
-			for( x=0 ; x <= lastnospace; x++ ){
-			wmove(win,y,x);
-			putc( winch(win) & A_CHARTEXT, f);
-			}	
-				putc( '\n', f );
-			}
-			wmove(win, ys, xs );
+	 	int x,y;
+			for (y=0; y < wlines(win); y++ ) 
+				for( x=0 ; x <= wcols(win); x++ )
+				{
+					wmove (win, y, x);
+					char tmp = winch (win) & A_CHARTEXT;
+					fwrite (&tmp, sizeof(char), 1, f);
+				}	
+		wmove (win, 0, 0);
 		}
 		switch (ch)
 		{
